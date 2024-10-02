@@ -30,23 +30,26 @@ public class Order {
     @JoinColumn(name = "delivery_id") //연관관계 주인
     private Delivery delivery;
 
-    private LocalDateTime localDateTime;
+    private LocalDateTime localDateTime;    //주문시간
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status; //주문상태 [ORDER, CANCEL]
 
-    //==연관관계 메서드==//
+    //==연관관계 메서드==// Mapping
 
+    //Member <-> Order
     public void setMember(Member member) {
         this.member = member;
         member.getOrderList().add(this);
     }
 
+    //OrderItem <-> Order
     public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
         orderItem.setOrder(this);
     }
 
+    //Delivery <-> Order
     public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
         delivery.setOrder(this);

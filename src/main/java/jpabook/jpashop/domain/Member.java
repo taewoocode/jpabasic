@@ -16,7 +16,7 @@ public class Member {
     @Column(name = "member_id")
     private Long Id;
 
-    private String username;
+    private String name;
 
     //내장타입
     @Embedded
