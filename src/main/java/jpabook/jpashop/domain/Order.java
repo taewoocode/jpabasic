@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -45,7 +44,8 @@ public class Order {
 
     //OrderItem <-> Order
     public void addOrderItem(OrderItem orderItem) {
-        orderItems.add(orderItem);
+        boolean add;
+        add = orderItems.add( orderItem );
         orderItem.setOrder(this);
     }
 
@@ -53,5 +53,45 @@ public class Order {
     public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
         delivery.setOrder(this);
+    }
+
+    //==생성 메서드==//
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
+        Order order = new Order();
+        order.setMember( member );
+        order.setDelivery( delivery );
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem( orderItem );
+        }
+        order.setStatus( OrderStatus.ORDER );
+        order.setLocalDateTime( LocalDateTime.now() );
+        return order;
+    }
+
+    //==비즈니스 로직==//
+
+    /**
+     * 주문취소가 가능해야 한다.
+     */
+    public void cancel() {
+        if (delivery.getStatus() == DeliveryStatus.COMP) {
+            throw new IllegalStateException( "이미 배송이 완료된 상품은 취소가 불가능합니다." );
+        }
+
+        this.setStatus( OrderStatus.CANCEL );
+        //재고 원복
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel();
+        }
+    }
+
+    //조회로직
+    /**
+     * 전체 주문 가격
+     */
+    public int getTotalPrice() {
+        int totalPrice = orderItems.stream()
+                .mapToInt( OrderItem::getTotalPrice ).sum();
+        return totalPrice;
     }
 }
