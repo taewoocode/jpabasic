@@ -18,7 +18,7 @@ public class OrderRepository {
     }
 
     public Order findOne(Long id) {
-        return em.find( Order.class, id );
+        return em.find(Order.class, id);
     }
 
     //검색기능은 동적쿼리가 들어가야 한다.
