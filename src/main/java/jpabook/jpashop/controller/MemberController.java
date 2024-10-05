@@ -7,8 +7,11 @@ import jpabook.jpashop.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -23,13 +26,23 @@ public class MemberController {
 
     //MemberForm이 파라미터로 넘어가게 된다.
     @PostMapping("/members/new")
-    public String create(@Valid MemberForm form) {
+    public String create(@Valid MemberForm form, BindingResult result) {
+        //만약 result에서 error가 존재한다면?
+        if (result.hasErrors()) {
+            return "members/createMemberForm";
+        }
+
         Address address = new Address( form.getCity(), form.getStreet(), form.getZipcode() );
         Member member = new Member();
         member.setName( form.getName() );
         member.setAddress( address );
         memberService.join( member );
         return "redirect:/";
+    }
 
+    @GetMapping("/members")
+    public String list(Model model) { //Model이라는 객체로 화면에 전달하게 된다.
+        model.addAttribute( "members", memberService.findMembers() );
+        return "members/memberList";
     }
 }
